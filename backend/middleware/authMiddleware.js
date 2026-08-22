@@ -1,0 +1,2 @@
+const jwt=require("jsonwebtoken"); const Admin=require("../models/Admin");
+module.exports=async(req,res,next)=>{try{const token=req.headers.authorization?.replace(/^Bearer\s+/i,"");if(!token)return res.status(401).json({success:false,message:"Authentication required"});const decoded=jwt.verify(token,process.env.JWT_SECRET);const admin=await Admin.findById(decoded.id);if(!admin)return res.status(401).json({success:false,message:"Admin account not found"});req.admin=admin;next()}catch{res.status(401).json({success:false,message:"Invalid or expired token"})}};

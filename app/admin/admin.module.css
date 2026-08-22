@@ -1,0 +1,20 @@
+.loginPage { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: #21150f; color: #f4f0e8; }
+.loginCard { width: min(100%, 400px); display: grid; gap: 15px; padding: 38px; background: #f4f0e8; color: #211b16; border-radius: 8px; }
+.loginCard p, .panelHeading p { margin: 0; color: #9a4a24; font: 11px monospace; letter-spacing: .15em; }
+.loginCard h1, .dashboard h1, .dashboard h2 { margin: 0; font-family: Georgia, serif; }
+.loginCard label { display: grid; gap: 7px; font-size: 13px; }
+.loginCard input, .contributionForm input { border: 1px solid #cfc4b5; border-radius: 4px; padding: 12px; font: inherit; }
+.loginCard button, .contributionForm button { border: 0; border-radius: 4px; padding: 13px; cursor: pointer; background: #8e3f1e; color: white; font-weight: 700; }
+.error { color: #b42318; font-size: 13px; }
+.dashboard { min-height: 100vh; padding: 42px max(6vw, 24px); background: #f4f0e8; color: #211b16; }
+.dashboard > header { display: flex; justify-content: space-between; gap: 20px; align-items: center; padding-bottom: 28px; border-bottom: 1px solid #d6cbbb; }
+.dashboard header p { margin: 0 0 7px; color: #8e3f1e; font: 11px monospace; letter-spacing: .14em; }
+.user { display: flex; align-items: center; gap: 16px; font-size: 12px; }
+.user button, .rows button { border: 0; background: transparent; color: #8e3f1e; cursor: pointer; font: inherit; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 30px 0; }
+.stats article, .panel { background: #fffdf9; border: 1px solid #dfd6ca; border-radius: 7px; padding: 24px; }
+.stats span { display: block; color: #756b61; font-size: 12px; }.stats strong { display: block; margin-top: 10px; font: 32px Georgia, serif; color: #8e3f1e; }
+.panel { margin-top: 20px; }.panelHeading { margin-bottom: 20px; }.panelHeading h2 { margin-top: 5px; font-size: 25px; }
+.contributionForm { display: grid; grid-template-columns: 2fr 1fr auto; gap: 10px; margin-bottom: 20px; }
+.rows > div { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-top: 1px solid #e4dbd0; font-size: 13px; }.rows span { display: grid; gap: 4px; }.rows small { color: #85776b; }.rows p { color: #85776b; font-size: 13px; }
+@media (max-width: 700px) { .dashboard { padding: 28px 18px; }.dashboard > header, .user { align-items: flex-start; flex-direction: column; }.stats, .contributionForm { grid-template-columns: 1fr; } }

@@ -1,0 +1,1 @@
+const mongoose=require("mongoose"); module.exports=mongoose.model("Gallery",new mongoose.Schema({title:{type:String,trim:true,maxlength:120},caption:{type:String,trim:true,maxlength:500},imageUrl:{type:String,required:true},publicId:{type:String,required:true},isVisible:{type:Boolean,default:true},displayOrder:{type:Number,default:0}},{timestamps:true}));

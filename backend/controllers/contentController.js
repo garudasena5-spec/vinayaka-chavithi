@@ -1,0 +1,12 @@
+const {uploadImage,deleteImage}=require("../services/cloudinaryService");
+const send=async(fn,res,next)=>{try{await fn()}catch(e){next(e)}};
+exports.singleton=(Model,defaults={})=>({
+ get:(req,res,next)=>send(async()=>{let item=await Model.findOne();if(!item)item=await Model.create(defaults);res.json({success:true,data:item})},res,next),
+ put:(imageFields,folder)=>async(req,res,next)=>send(async()=>{let item=await Model.findOne();if(!item)item=new Model();Object.assign(item,req.body);if(req.file&&imageFields){const image=await uploadImage(req.file,folder);if(item[imageFields.publicId])await deleteImage(item[imageFields.publicId]);item[imageFields.url]=image.url;item[imageFields.publicId]=image.publicId}await item.save();res.json({success:true,data:item})},res,next)
+});
+exports.collection=(Model,{folder,imageUrl="imageUrl",publicId="publicId",required=[]}={})=>({
+ get:async(req,res,next)=>send(async()=>{const filter=req.admin?{}:{isVisible:true};const items=await Model.find(filter).sort({displayOrder:1,createdAt:-1});const total=Model.modelName==="Contribution"?items.reduce((sum,x)=>sum+x.amount,0):undefined;res.json({success:true,data:items,...(total!==undefined?{meta:{total}}:{})})},res,next),
+ create:async(req,res,next)=>send(async()=>{for(const key of required)if(req.body[key]===undefined)return res.status(400).json({success:false,message:`${key} is required`});const data={...req.body};if(req.file){const image=await uploadImage(req.file,folder);data[imageUrl]=image.url;data[publicId]=image.publicId}if(Model.modelName==="Gallery"&&!data.imageUrl)return res.status(400).json({success:false,message:"Image is required"});const item=await Model.create(data);res.status(201).json({success:true,data:item})},res,next),
+ update:async(req,res,next)=>send(async()=>{const item=await Model.findById(req.params.id);if(!item)return res.status(404).json({success:false,message:"Resource not found"});Object.assign(item,req.body);if(req.file){const image=await uploadImage(req.file,folder);if(item[publicId])await deleteImage(item[publicId]);item[imageUrl]=image.url;item[publicId]=image.publicId}await item.save();res.json({success:true,data:item})},res,next),
+ remove:async(req,res,next)=>send(async()=>{const item=await Model.findById(req.params.id);if(!item)return res.status(404).json({success:false,message:"Resource not found"});if(item[publicId])await deleteImage(item[publicId]);await item.deleteOne();res.json({success:true,data:{id:req.params.id}})},res,next)
+});

@@ -1,0 +1,2 @@
+const mongoose = require("mongoose");
+module.exports = mongoose.model("Hero",new mongoose.Schema({title:{type:String,trim:true,default:"Ganesh Chaturthi"},subtitle:{type:String,trim:true,default:"GARUDASENA"},tagline:{type:String,trim:true,default:"A celebration made together."},imageUrl:String,imagePublicId:String,ctaText:{type:String,default:"Join the celebration"},ctaTarget:{type:String,default:"contributions"},eventDate:{type:Date,default:()=>new Date("2026-09-14T00:00:00+05:30")},isActive:{type:Boolean,default:true}},{timestamps:true}));

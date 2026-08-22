@@ -1,0 +1,1 @@
+const mongoose=require("mongoose"); module.exports=mongoose.model("PaymentDetails",new mongoose.Schema({upiId:{type:String,trim:true,maxlength:120},phonePeNumber:{type:String,trim:true,maxlength:30},qrCodeUrl:String,qrCodePublicId:String,instructions:{type:String,trim:true,maxlength:1000},isActive:{type:Boolean,default:true}},{timestamps:true}));
