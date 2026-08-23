@@ -11,7 +11,6 @@ const team = [
   { initial: "", name: "K sathesh", role: "Art President", description: "Keeping every ritual rooted in shared devotion.", src: "/teammem5.jpeg" },
   { initial: "", name: "P venkatesh", role: "Creative Director", description: "Caring for every contribution with transparency.", src: "/teammem6.jpeg" },
   { initial: "", name: "M Srinu", role: "Support Coordinator", description: "Helping hands come together at every step.", src: "/teammem7.png" },
-
 ];
 // Replace each source below with the final image URL when it is available.
 // These cards are deliberately kept as static homepage content (no API or storage service).
@@ -21,10 +20,14 @@ const gallery = [
   { title: "Togetherness", src: "./Lord-Ganesh.webp" },
   { title: "Devotion", src: "./ganesh4.png" },
   { title: "The Process", src: "./ganesh3.jpg" },
- 
 ];
 const GOOGLE_DRIVE_MEMORIES_URL = "https://photos.app.goo.gl/a4Uqh3aS8WCVZYVx9";
-type Contribution = { _id: string; contributorName: string; amount: number };
+type FinancialSummary = {
+  totalReceived: number;
+  totalSpent: number;
+  remaining: number;
+  expenses: { _id: string; category: string; amount: number }[];
+};
 
 /* ------------------------------------------------------------------
    All 3D / motion below is applied as inline styles via refs.
@@ -39,6 +42,8 @@ function useReveal<T extends HTMLElement>(delay = 0) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
     el.style.opacity = "0";
     el.style.transform = "translateY(36px)";
     el.style.transition = `opacity .8s cubic-bezier(.2,.7,.2,1) ${delay}ms, transform .8s cubic-bezier(.2,.7,.2,1) ${delay}ms`;
@@ -64,6 +69,7 @@ function useTilt<T extends HTMLElement>(max = 10) {
   const onMouseMove = (e: React.MouseEvent<T>) => {
     const el = ref.current;
     if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const r = el.getBoundingClientRect();
     const px = (e.clientX - r.left) / r.width - 0.5;
     const py = (e.clientY - r.top) / r.height - 0.5;
@@ -83,7 +89,51 @@ function useTilt<T extends HTMLElement>(max = 10) {
   return { ref, onMouseMove, onMouseLeave, onMouseEnter };
 }
 
-/* ---------------- Countdown (hydration-safe) ---------------- */
+/* ---------------- Site mark (logo image, graceful fallback) ---------------- */
+function SiteLogo({ variant }: { variant: "nav" | "hero" }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) {
+    return variant === "hero" ? (
+      <div className="hero-logo hero-logo--fallback" aria-hidden="true">
+        <span>✦</span>
+      </div>
+    ) : (
+      <i>✦</i>
+    );
+  }
+  return (
+    <img
+      src="/logo.png"
+      alt="GARUDASENA emblem"
+      className={variant === "hero" ? "hero-logo" : "nav-logo"}
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
+/* ---------------- Garland divider (signature element) ----------------
+   A hand-strung marigold garland separating sections, the way real
+   toran bunting marks a threshold. Sways gently; respects
+   prefers-reduced-motion. */
+function Garland({ tone = "light" }: { tone?: "light" | "dark" }) {
+  const flowers = Array.from({ length: 17 });
+  return (
+    <div className={`garland garland--${tone}`} aria-hidden="true">
+      <svg viewBox="0 0 1200 60" preserveAspectRatio="none" className="garland-svg">
+        <path d="M0 6 C 200 54, 400 54, 600 30 C 800 6, 1000 6, 1200 40" className="garland-string" />
+      </svg>
+      <div className="garland-flowers">
+        {flowers.map((_, i) => (
+          <span key={i} className="garland-flower" style={{ animationDelay: `${(i % 5) * 0.4}s` }}>
+            ✿
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Countdown (hydration-safe, big-format) ---------------- */
 function Countdown() {
   const target = new Date("2026-09-14T00:00:00+05:30").getTime();
   // null on the very first render, so server HTML and the first client
@@ -101,7 +151,7 @@ function Countdown() {
     return (
       <div className="countdown">
         {labels.map((label) => (
-          <div key={label}>
+          <div className="countdown-cell" key={label}>
             <strong>--</strong>
             <span>{label}</span>
           </div>
@@ -109,13 +159,13 @@ function Countdown() {
       </div>
     );
   }
-  if (left <= 0) return <p className="begun">Ganesh Chaturthi Has Begun</p>;
+  if (left <= 0) return <p className="begun">Ganesh Chaturthi Has Begun — Ganpati Bappa Morya!</p>;
 
   const v = [Math.floor(left / 864e5), Math.floor((left / 36e5) % 24), Math.floor((left / 6e4) % 60), Math.floor((left / 1e3) % 60)];
   return (
     <div className="countdown">
       {v.map((x, i) => (
-        <div key={i}>
+        <div className="countdown-cell" key={i}>
           <strong>{String(x).padStart(2, "0")}</strong>
           <span>{labels[i]}</span>
         </div>
@@ -160,6 +210,7 @@ function Hero() {
   const orbRef = useRef<HTMLDivElement>(null);
   const raysRef = useRef<HTMLDivElement>(null);
   const deityRef = useRef<HTMLDivElement>(null);
+  const plateRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -170,7 +221,9 @@ function Hero() {
       if (orbRef.current) orbRef.current.style.transform = `translate3d(${px * 30}px, ${py * 30}px, 0)`;
       if (raysRef.current) raysRef.current.style.transform = `rotate(${px * 6}deg)`;
       if (deityRef.current)
-        deityRef.current.style.transform = `perspective(1000px) rotateY(${px * -14}deg) rotateX(${py * 10}deg) translateZ(20px)`;
+        deityRef.current.style.transform = `perspective(1000px) rotateY(${px * -12}deg) rotateX(${py * 8}deg) translateZ(20px)`;
+      if (plateRef.current)
+        plateRef.current.style.transform = `perspective(1200px) rotateX(${py * -4}deg) rotateY(${px * 4}deg)`;
     };
     window.addEventListener("mousemove", onMove);
     return () => window.removeEventListener("mousemove", onMove);
@@ -180,35 +233,42 @@ function Hero() {
     <section className="hero" id="home">
       <div className="orb" ref={orbRef} />
       <div className="rays" ref={raysRef} />
-      <div className="hero-copy">
-        <p className="eyebrow">Mekanuru East street</p>
-        <h1>
-          <em>Vinayaka</em>
-          <br />
-          Chavithi
-        </h1>
-        <p>Where heritage meets the energy of a new generation. A celebration made together, for everyone.</p>
-        <div className="actions">
-          <a href="#contributions" className="button">
-            Join the celebration <span>→</span>
-          </a>
-          <a href="#about">Discover our story ↓</a>
-        </div>
-      </div>
-      <div className="deity">
+      <div className="hero-veil" />
+
+      <div className="deity" aria-hidden="true">
         <div className="halo" />
         <div ref={deityRef} style={{ transition: "transform .15s ease-out", willChange: "transform" }}>
           <GaneshMark />
         </div>
-        <small>Jai bolo ganesh maharaj ki</small>
       </div>
-      <div className="hero-bottom">
-        <div>
-          <p>COUNTDOWN TO CELEBRATION</p>
+
+      <div className="hero-inner">
+        <SiteLogo variant="hero" />
+        <p className="eyebrow">Mekanuru East Street</p>
+        <h1>
+          <em>Garudasena</em>
+        </h1>
+        <p className="hero-sub">Where heritage meets the energy of a new generation. A celebration made together, for everyone.</p>
+
+        <div className="countdown-plate" ref={plateRef}>
+          <span className="countdown-plate-label">Ganesh Chaturthi begins in</span>
           <Countdown />
         </div>
-        <a href="#about">SCROLL TO EXPLORE ↓</a>
+
+        <div className="actions">
+          <a href="#contributions" className="button">
+            Join the celebration <span>→</span>
+          </a>
+          <a href="#about" className="link-underline">
+            Discover our story ↓
+          </a>
+        </div>
       </div>
+
+      <a className="scroll-cue" href="#about">
+        <span>Scroll to explore</span>
+        <i />
+      </a>
     </section>
   );
 }
@@ -283,7 +343,7 @@ export default function HomePage() {
   const [menu, setMenu] = useState(false);
   const [picked, setPicked] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
-  const [contributions, setContributions] = useState<Contribution[]>([]);
+  const [financialSummary, setFinancialSummary] = useState<FinancialSummary | null>(null);
   const qrTilt = useTilt<HTMLDivElement>(6);
 
   useEffect(() => {
@@ -293,19 +353,17 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    api<Contribution[]>("/api/contributions").then(setContributions).catch(() => setContributions([]));
+    api<FinancialSummary>("/api/financial-summary").then(setFinancialSummary).catch(() => setFinancialSummary(null));
   }, []);
-
-  const contributionTotal = contributions.reduce((total, contribution) => total + contribution.amount, 0);
 
   return (
     <main>
       <div className="grain" />
       <header className={`nav ${scrolled ? "scrolled" : ""}`}>
         <a className="brand" href="#home">
-          <i>✦</i> GARUDASENA
+          <SiteLogo variant="nav" /> GARUDASENA
         </a>
-        <button className="menu" onClick={() => setMenu(!menu)}>
+        <button className="menu" onClick={() => setMenu(!menu)} aria-label="Toggle menu">
           {menu ? "×" : "☰"}
         </button>
         <nav className={menu ? "open" : ""}>
@@ -321,9 +379,9 @@ export default function HomePage() {
       </header>
 
       <Hero />
+      <Garland tone="dark" />
 
       <Reveal className="intro section" id="about">
-        <div className="num">01</div>
         <div>
           <p className="eyebrow">THE SPIRIT OF GARUDASENA</p>
           <h2>
@@ -334,7 +392,9 @@ export default function HomePage() {
         </div>
         <div className="intro-copy">
           <p>GARUDASENA is more than a celebration. It is a shared expression of devotion, a stage for our youth, and a promise to carry tradition forward with fresh energy.</p>
-          <a href="#team">Meet our community ↗</a>
+          <a href="#team" className="link-underline">
+            Meet our community ↗
+          </a>
         </div>
         <div className="stats">
           <div>
@@ -368,6 +428,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <Garland tone="light" />
+
       <Reveal className="contribute" id="contributions">
         <div>
           <p className="eyebrow">A SMALL GESTURE, A GREAT CELEBRATION</p>
@@ -381,82 +443,72 @@ export default function HomePage() {
             Contribute now <span>→</span>
           </a>
         </div>
-        <div
-          className="qr-tilt"
-          ref={qrTilt.ref}
-          onMouseMove={qrTilt.onMouseMove}
-          onMouseLeave={qrTilt.onMouseLeave}
-          onMouseEnter={qrTilt.onMouseEnter}
-        >
+        <div className="qr-tilt" ref={qrTilt.ref} onMouseMove={qrTilt.onMouseMove} onMouseLeave={qrTilt.onMouseLeave} onMouseEnter={qrTilt.onMouseEnter}>
           <div className="contribute-card">
-  <div className="contribute-card-header">
-    <span>SCAN & CONTRIBUTE</span>
-    <i>✦</i>
-  </div>
+            <div className="contribute-card-header">
+              <span>SCAN & CONTRIBUTE</span>
+              <i>✦</i>
+            </div>
 
-  <div className="qr-wrapper">
-    <img
-      src="/phonepay.png"
-      alt="GARUDASENA UPI QR Code"
-    />
-  </div>
+            <div className="qr-wrapper">
+              <img src="/phonepay.png" alt="GARUDASENA UPI QR Code" />
+            </div>
 
-  <div className="upi-details">
-    <p>UPI ID</p>
+            <div className="upi-details">
+              <p>UPI ID</p>
 
-    <div className="upi-row">
-      <strong>7989141890@ybl</strong>
-      <button
-        type="button"
-        onClick={() =>
-          navigator.clipboard.writeText("7989141890@ybl")
-        }
-      >
-        Copy
-      </button>
-    </div>
-  </div>
+              <div className="upi-row">
+                <strong>7989141890@ybl</strong>
+                <button type="button" onClick={() => navigator.clipboard.writeText("7989141890@ybl")}>
+                  Copy
+                </button>
+              </div>
+            </div>
 
-  <div className="payment-note">
-    <span>✓</span>
-    <small>
-      Scan the QR code or use the UPI ID above to contribute.
-    </small>
-  </div>
+            <div className="payment-note">
+              <span>✓</span>
+              <small>Scan the QR code or use the UPI ID above to contribute.</small>
+            </div>
 
-  <div className="managed-by">
-    Payment details managed securely by <strong>GARUDASENA</strong>
-  </div>
-</div>
+            <div className="managed-by">
+              Payment details managed securely by <strong>GARUDASENA</strong>
+            </div>
+          </div>
         </div>
       </Reveal>
 
       <Reveal className="received section">
         <div>
-          <p className="eyebrow">WITH GRATITUDE</p>
+          <p className="eyebrow">TRANSPARENT CELEBRATION FUND</p>
           <h2>
-            Contributions
+            Fund
             <br />
-            <em>received.</em>
+            <em>overview.</em>
           </h2>
           <div className="total">
             <span>TOTAL CONTRIBUTIONS</span>
             <strong>
-              ₹ <b>{contributionTotal.toLocaleString("en-IN")}</b>
-          </strong>
-          <span>{contributions.length} contribution{contributions.length === 1 ? "" : "s"}</span>
+              ₹ <b>{(financialSummary?.totalReceived ?? 0).toLocaleString("en-IN")}</b>
+            </strong>
+          </div>
+          <div className="fund-cards">
+            <div><span>Total amount received</span><strong>₹{(financialSummary?.totalReceived ?? 0).toLocaleString("en-IN")}</strong></div>
+            <div><span>Amount spent</span><strong>₹{(financialSummary?.totalSpent ?? 0).toLocaleString("en-IN")}</strong></div>
+            <div className="balance"><span>Remaining amount</span><strong>₹{(financialSummary?.remaining ?? 0).toLocaleString("en-IN")}</strong></div>
           </div>
         </div>
-        <div className="list">
-          {contributions.map((contribution, i) => (
-            <div key={contribution._id}>
-              <span>0{i + 1}</span>
-              <b>{contribution.contributorName}</b>
-              <strong>₹ {contribution.amount.toLocaleString("en-IN")}</strong>
-              <i>↗</i>
-            </div>
-          ))}
-          {!contributions.length && <p className="empty-content">Contribution records will appear here once added by the organizers.</p>}
+        <div className="expense-breakdown">
+          <div className="expense-heading"><div><p className="eyebrow">SPENDING BREAKDOWN</p><h3>Where the fund is <em>going.</em></h3></div><span>{financialSummary?.expenses.length ?? 0} categories</span></div>
+          <div className="expense-list">
+            {financialSummary?.expenses.map((expense) => (
+              <div key={expense._id}>
+                <span className="expense-mark" />
+                <b>{expense.category}</b>
+                <strong>₹{expense.amount.toLocaleString("en-IN")}</strong>
+              </div>
+            ))}
+            {!financialSummary?.expenses.length && <p className="empty-content">Spending details will be published here by the organizers.</p>}
+          </div>
         </div>
       </Reveal>
 
@@ -468,7 +520,9 @@ export default function HomePage() {
               Frames of <em>faith.</em>
             </h2>
           </div>
-          <a href={GOOGLE_DRIVE_MEMORIES_URL} target="_blank" rel="noreferrer">View all memories ↗</a>
+          <a href={GOOGLE_DRIVE_MEMORIES_URL} target="_blank" rel="noreferrer">
+            View all memories ↗
+          </a>
         </div>
         <div className="gallery-grid">
           {gallery.map(({ title, src }, i) => (
@@ -489,19 +543,17 @@ export default function HomePage() {
         </a>
         <div className="footer-bottom">
           <a className="brand" href="#home">
-            <i>✦</i> GARUDASENA
+            <SiteLogo variant="nav" /> GARUDASENA
           </a>
-       <strong>   <p> Website Made by campus code labs</p></strong>
+          <strong>
+            <p>Website made by Campus Code Labs</p>
+          </strong>
           <span>
-  For website{" "}
-  <a
-    href="https://wa.me/8985373780"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    contact:<strong>campuscodelabs@gmail.com</strong>
-  </a>
-</span>
+            For website{" "}
+            <a href="https://wa.me/8985373780" target="_blank" rel="noopener noreferrer">
+              contact:<strong>campuscodelabs@gmail.com</strong>
+            </a>
+          </span>
         </div>
       </footer>
 
