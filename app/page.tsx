@@ -3,17 +3,55 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "../lib/api";
 
 const nav = ["Home", "About", "Team", "Contributions", "Gallery", "Contact"];
-const team = [
-  { initial: "", name: "k Pavan", role: "President", description: "Guiding every moment with care and clarity.", src: "/teammem1.png" },
-  { initial: "", name: "K Sudhakar", role: "ustav head", description: "Creating an experience the community feels.", src: "/teammem2.png" },
-  { initial: "", name: "P Dinesh", role: "Logistics head", description: "Making every detail come together beautifully.", src: "/teammem3.png" },
-  { initial: "", name: "K rahul", role: "Volunteer captain", description: "Bringing our people and purpose closer.", src: "/teammem4.jpeg" },
-  { initial: "", name: "K sathesh", role: "Art President", description: "Keeping every ritual rooted in shared devotion.", src: "/teammem5.jpeg" },
-  { initial: "", name: "P venkatesh", role: "Creative Director", description: "Caring for every contribution with transparency.", src: "/teammem6.jpeg" },
-  { initial: "", name: "M Srinu", role: "Support Coordinator", description: "Helping hands come together at every step.", src: "/teammem7.png" },
+
+/* ------------------------------------------------------------------
+   Committee roster — split into two facing groups of 13, with the
+   emblem anchored between them. Order preserved from the source list;
+   only the presentation (cards instead of photos) has changed.
+------------------------------------------------------------------- */
+const committeeLeft = [
+  { name: "M.Sudheer", role: "Organizer & Sponsorship Lead" },
+  { name: "P.Srikanth Reddy", role: "Event Coordinator" },
+  { name: "K.Pavan", role: "President" },
+  { name: "K.Vinay", role: "Event Organizer" },
+  { name: "K.Vamsi", role: "Treasurer" },
+  { name: "Venky Parvatala", role: "Creative Director & Website Administrator" },
+  { name: "K.Sudhakar", role: "Utsav Head" },
+  { name: "K.Rahul", role: "Volunteer Captain" },
+  { name: "K.Praveen", role: "Visarjan Head" },
+  { name: "K.Satheesh", role: "Art President" },
+  { name: "B.Teja", role: "Media Organizer" },
+  { name: "P.Dinesh", role: "Logistics Head" },
+  { name: "P.Charan", role: "Art Manager" },
 ];
-// Replace each source below with the final image URL when it is available.
-// These cards are deliberately kept as static homepage content (no API or storage service).
+
+const committeeRight = [
+  { name: "U.Adi", role: "Support Lead" },
+  { name: "M.Srinu", role: "Support Coordinator" },
+  { name: "M.Sai Teja", role: "Pooja Coordinator" },
+  { name: "M.Sai", role: "Vice President" },
+  { name: "M.Hemanth", role: "Fund Rising Manager" },
+  { name: "A. Naveen", role: "Community Head" },
+  { name: "P.Yaswanth", role: "Art Member" },
+  { name: "B.Santhosh", role: "Content Editor" },
+  { name: "V.Suresh", role: "Support Champion" },
+  { name: "P. Ayeel Kumar", role: "Support Lead" },
+  { name: "A.Hariprasad", role: "Art Member" },
+  { name: "U.Prasanth", role: "Support Member" },
+  { name: "P.Vinay", role: "Support Member" },
+];
+
+function getInitials(name: string): string {
+  const tokens = name
+    .split(/[\s.]+/)
+    .map((t) => t.trim())
+    .filter(Boolean);
+  return tokens
+    .slice(0, 2)
+    .map((t) => t[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
 const gallery = [
   { title: "Celebration", src: "./Logo.jpeg" },
   { title: "Tradition", src: "./vinayaka1.png" },
@@ -63,6 +101,36 @@ function useReveal<T extends HTMLElement>(delay = 0) {
   return ref;
 }
 
+/** Fade + slide in from a side once the element enters the viewport —
+    used by the committee roster so the two groups appear to converge
+    on the emblem, one card after another. */
+function useRevealSide<T extends HTMLElement>(direction: "left" | "right", delay = 0) {
+  const ref = useRef<T>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+    const startX = direction === "left" ? -46 : 46;
+    el.style.opacity = "0";
+    el.style.transform = `translateX(${startX}px)`;
+    el.style.transition = `opacity .7s cubic-bezier(.2,.7,.2,1) ${delay}ms, transform .7s cubic-bezier(.2,.7,.2,1) ${delay}ms`;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          el.style.opacity = "1";
+          el.style.transform = "translateX(0)";
+          io.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [direction, delay]);
+  return ref;
+}
+
 /** 3D tilt toward the cursor, reset on mouse leave. */
 function useTilt<T extends HTMLElement>(max = 10) {
   const ref = useRef<T>(null);
@@ -103,7 +171,7 @@ function SiteLogo({ variant }: { variant: "nav" | "hero" }) {
   }
   return (
     <img
-      src="/logo.png"
+      src="/Logo1.jpeg"
       alt="GARUDASENA emblem"
       className={variant === "hero" ? "hero-logo" : "nav-logo"}
       onError={() => setFailed(true)}
@@ -273,34 +341,36 @@ function Hero() {
   );
 }
 
-function TeamCard({ initial, name, role, description, src, i }: (typeof team)[number] & { i: number }) {
-  const reveal = useReveal<HTMLDivElement>(i * 80);
-  const tilt = useTilt<HTMLDivElement>(8);
+/* ---------------- Roster emblem (center anchor between the two groups) ---------------- */
+function RosterEmblem() {
+  const [failed, setFailed] = useState(false);
   return (
-    <div
-      ref={(node) => {
-        (reveal as React.MutableRefObject<HTMLDivElement | null>).current = node;
-        (tilt.ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
-      }}
-      onMouseMove={tilt.onMouseMove}
-      onMouseLeave={tilt.onMouseLeave}
-      onMouseEnter={tilt.onMouseEnter}
-    >
-      <article>
-        <div className={`portrait p${i}`}>
-          <img src={src} alt={name} />
-          <span>{initial}</span>
-          <small>GARUDASENA</small>
-        </div>
-        <div className="member">
-          <div>
-            <h3>{name}</h3>
-            <p>{role}</p>
-          </div>
-          <b>↗</b>
-        </div>
-        <p>{description}</p>
-      </article>
+    <div className="roster-emblem">
+      <div className="roster-emblem-plate">
+        {!failed ? (
+          <img src="/Logo1.jpeg" alt="GARUDASENA emblem" onError={() => setFailed(true)} />
+        ) : (
+          <span className="roster-emblem-fallback">✦</span>
+        )}
+      </div>
+      <div className="roster-emblem-label">
+        <span>Our Committee</span>
+        <strong>Garudasena · 2026</strong>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Roster card (name + role, no photo) ---------------- */
+function RosterCard({ name, role, index, side }: { name: string; role: string; index: number; side: "left" | "right" }) {
+  const reveal = useRevealSide<HTMLDivElement>(side, index * 90);
+  return (
+    <div className="roster-card" ref={reveal}>
+      <span className="roster-avatar">{getInitials(name)}</span>
+      <div className="roster-info">
+        <h3>{name}</h3>
+        <p>{role}</p>
+      </div>
     </div>
   );
 }
@@ -419,10 +489,19 @@ export default function HomePage() {
           <br />
           many hands.
         </h2>
-        <div className="team-marquee">
-          <div className="team-grid">
-            {[...team, ...team].map((member, i) => (
-              <TeamCard key={`${member.src}-${i}`} {...member} i={i % team.length} />
+
+        <div className="roster">
+          <div className="roster-column roster-column--left">
+            {committeeLeft.map((m, i) => (
+              <RosterCard key={m.name} name={m.name} role={m.role} index={i} side="left" />
+            ))}
+          </div>
+
+          <RosterEmblem />
+
+          <div className="roster-column roster-column--right">
+            {committeeRight.map((m, i) => (
+              <RosterCard key={m.name} name={m.name} role={m.role} index={i} side="right" />
             ))}
           </div>
         </div>
