@@ -5,40 +5,39 @@ import { api } from "../lib/api";
 const nav = ["Home", "About", "Team", "Contributions", "Gallery", "Contact"];
 
 /* ------------------------------------------------------------------
-   Committee roster — split into two facing groups of 13, with the
-   emblem anchored between them. Order preserved from the source list;
-   only the presentation (cards instead of photos) has changed.
+   Committee roster — single flat list, rendered as photo cards in a
+   wrapping grid (matches the reference site's "Meet our members"
+   layout). Swap these placeholder `img` paths for real photos in
+   /public/members/ whenever you have them — the card gracefully
+   falls back to initials if an image 404s.
 ------------------------------------------------------------------- */
-const committeeLeft = [
-  { name: "M.Sudheer", role: "Organizer & Sponsorship Lead" },
-  { name: "P.Srikanth Reddy", role: "Event Coordinator" },
-  { name: "K.Pavan", role: "President" },
-  { name: "K.Vinay", role: "Event Organizer" },
-  { name: "K.Vamsi", role: "Treasurer" },
-  { name: "Venky Parvatala", role: "Creative Director & Website Administrator" },
-  { name: "K.Sudhakar", role: "Utsav Head" },
-  { name: "K.Rahul", role: "Volunteer Captain" },
-  { name: "K.Praveen", role: "Visarjan Head" },
-  { name: "K.Satheesh", role: "Art President" },
-  { name: "B.Teja", role: "Media Organizer" },
-  { name: "P.Dinesh", role: "Logistics Head" },
-  { name: "P.Charan", role: "Art Manager" },
-];
-
-const committeeRight = [
-  { name: "U.Adi", role: "Support Lead" },
-  { name: "M.Srinu", role: "Support Coordinator" },
-  { name: "M.Sai Teja", role: "Pooja Coordinator" },
-  { name: "M.Sai", role: "Vice President" },
-  { name: "M.Hemanth", role: "Fund Rising Manager" },
-  { name: "A. Naveen", role: "Community Head" },
-  { name: "P.Yaswanth", role: "Art Member" },
-  { name: "B.Santhosh", role: "Content Editor" },
-  { name: "V.Suresh", role: "Support Champion" },
-  { name: "P. Ayeel Kumar", role: "Support Lead" },
-  { name: "A.Hariprasad", role: "Art Member" },
-  { name: "U.Prasanth", role: "Support Member" },
-  { name: "P.Vinay", role: "Support Member" },
+const committee = [
+  { name: "M.Sudheer", role: "Organizer & Sponsorship Lead", img: "/members/sudheer.jpg" },
+  { name: "P.Srikanth Reddy", role: "Event Coordinator", img: "/members/srikanth.jpg" },
+  { name: "K.Pavan", role: "President", img: "/members/pavan.jpg" },
+  { name: "K.Vinay", role: "Event Organizer", img: "/members/vinay-k.jpg" },
+  { name: "K.Vamsi", role: "Treasurer", img: "/members/vamsi.jpg" },
+  { name: "Venky Parvatala", role: "Creative Director & Website Administrator", img: "teammem6.jpeg" },
+  { name: "K.Sudhakar", role: "Utsav Head", img: "/members/sudhakar.jpg" },
+  { name: "K.Rahul", role: "Volunteer Captain", img: "/members/rahul.jpg" },
+  { name: "K.Praveen", role: "Visarjan Head", img: "/members/praveen.jpg" },
+  { name: "K.Satheesh", role: "Art President", img: "/members/satheesh.jpg" },
+  { name: "B.Teja", role: "Media Organizer", img: "/members/teja.jpg" },
+  { name: "P.Dinesh", role: "Logistics Head", img: "/members/dinesh.jpg" },
+  { name: "P.Charan", role: "Art Manager", img: "/members/charan.jpg" },
+  { name: "U.Adi", role: "Support Lead", img: "/members/adi.jpg" },
+  { name: "M.Srinu", role: "Support Coordinator", img: "/members/srinu.jpg" },
+  { name: "M.Sai Teja", role: "Pooja Coordinator", img: "/members/saiteja.jpg" },
+  { name: "M.Sai", role: "Vice President", img: "/members/sai.jpg" },
+  { name: "M.Hemanth", role: "Fund Rising Manager", img: "/members/hemanth.jpg" },
+  { name: "A. Naveen", role: "Community Head", img: "/members/naveen.jpg" },
+  { name: "P.Yaswanth", role: "Art Member", img: "/members/yaswanth.jpg" },
+  { name: "B.Santhosh", role: "Content Editor", img: "/members/santhosh.jpg" },
+  { name: "V.Suresh", role: "Support Champion", img: "/members/suresh.jpg" },
+  { name: "P. Ayeel Kumar", role: "Support Lead", img: "/members/ayeel.jpg" },
+  { name: "A.Hariprasad", role: "Art Member", img: "/members/hariprasad.jpg" },
+  { name: "U.Prasanth", role: "Support Member", img: "/members/prasanth.jpg" },
+  { name: "P.Vinay", role: "Support Member", img: "/members/vinay-p.jpg" },
 ];
 
 function getInitials(name: string): string {
@@ -68,10 +67,8 @@ type FinancialSummary = {
 };
 
 /* ------------------------------------------------------------------
-   All 3D / motion below is applied as inline styles via refs.
-   Nothing here depends on new CSS classes, so it layers cleanly on
-   top of your existing globals.css without touching or colliding
-   with any of its selectors.
+   Motion hooks — unchanged from before, applied via inline styles so
+   they layer on top of globals.css without new selectors colliding.
 ------------------------------------------------------------------- */
 
 /** Fade + rise in once the element enters the viewport. */
@@ -98,36 +95,6 @@ function useReveal<T extends HTMLElement>(delay = 0) {
     io.observe(el);
     return () => io.disconnect();
   }, [delay]);
-  return ref;
-}
-
-/** Fade + slide in from a side once the element enters the viewport —
-    used by the committee roster so the two groups appear to converge
-    on the emblem, one card after another. */
-function useRevealSide<T extends HTMLElement>(direction: "left" | "right", delay = 0) {
-  const ref = useRef<T>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
-    const startX = direction === "left" ? -46 : 46;
-    el.style.opacity = "0";
-    el.style.transform = `translateX(${startX}px)`;
-    el.style.transition = `opacity .7s cubic-bezier(.2,.7,.2,1) ${delay}ms, transform .7s cubic-bezier(.2,.7,.2,1) ${delay}ms`;
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          el.style.opacity = "1";
-          el.style.transform = "translateX(0)";
-          io.disconnect();
-        }
-      },
-      { threshold: 0.2 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [direction, delay]);
   return ref;
 }
 
@@ -163,7 +130,7 @@ function SiteLogo({ variant }: { variant: "nav" | "hero" }) {
   if (failed) {
     return variant === "hero" ? (
       <div className="hero-logo hero-logo--fallback" aria-hidden="true">
-        <span>✦</span>
+        
       </div>
     ) : (
       <i>✦</i>
@@ -242,135 +209,66 @@ function Countdown() {
   );
 }
 
-/* ---------------- Ganesh mark ----------------
-   Drop a transparent PNG/WebP at /public/ganesha-hero.png and it will
-   be used automatically. Falls back to the drawn SVG murti otherwise.
-   Both use the existing ".mark" class from globals.css, so sizing,
-   the drop-shadow, and the float animation apply either way. */
-function GaneshMark() {
-  const [failed, setFailed] = useState(false);
-  if (!failed) {
-    return <img src="/ganesha.png" alt="Lord Ganesha" className="mark" onError={() => setFailed(true)} />;
-  }
-  return (
-    <svg className="mark" viewBox="0 0 430 500" role="img" aria-label="Lord Ganesha illustration">
-      <defs>
-        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-          <stop stopColor="#ffe7a5" />
-          <stop offset=".45" stopColor="#f0a93b" />
-          <stop offset="1" stopColor="#a3480f" />
-        </linearGradient>
-      </defs>
-      <path d="M213 72c-52 5-84 40-82 91 1 39 25 76 45 99-20 37-6 84 38 109 3 35-14 67-52 88 52 9 103-17 109-70 43-28 58-78 37-120 24-32 31-59 24-84-11-44-55-68-91-52-11 4-19 10-28 18z" fill="url(#g)" stroke="#4a1c07" strokeWidth="2" />
-      <path d="M207 143c-40 9-53 47-36 78 8 15 18 28 34 42m46-118c35 20 39 58 21 88-9 15-18 27-31 39" fill="none" stroke="#2c1005" strokeWidth="9" strokeLinecap="round" />
-      <path d="M217 276c-42 12-57 54-28 83 16 16 38 23 59 18 18-4 32-18 39-34-24 14-45 12-56-7-11-21-3-42 16-59-10-5-20-5-30-1z" fill="#2c120b" />
-      <path d="M178 205c12 16 30 17 44 1m33-1c-12 16-30 17-44 1" fill="none" stroke="#2c120b" strokeWidth="7" strokeLinecap="round" />
-      <ellipse cx="211" cy="184" rx="4" ry="11" fill="#d6782e" />
-      <path d="M215 43l18 37h-36zM102 146l41 11-22 26zm225 0l-41 11 22 26z" fill="url(#g)" />
-      <path d="M95 397c35-49 73-55 120-20 43-35 83-29 120 20-39-19-79-18-120 4-41-22-81-23-120-4z" fill="url(#g)" />
-      <path d="M69 426c49-24 96-19 146 14 50-33 97-38 146-14-45 34-97 43-146 17-50 26-101 17-146-17z" fill="#9c491c" opacity=".8" />
-    </svg>
-  );
-}
-
-/* ---------------- Hero with mouse-driven 3D parallax ---------------- */
+/* ---------------- Hero ----------------
+   Static full-bleed photo hero (matches the reference site): a
+   background image, a legibility overlay, emblem + eyebrow + headline,
+   two side-by-side CTA buttons, and the countdown plate underneath.
+   Drop your own photo at /public/hero-ganesh.jpg. */
 function Hero() {
-  const orbRef = useRef<HTMLDivElement>(null);
-  const raysRef = useRef<HTMLDivElement>(null);
-  const deityRef = useRef<HTMLDivElement>(null);
-  const plateRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
-    const onMove = (e: MouseEvent) => {
-      const px = e.clientX / window.innerWidth - 0.5;
-      const py = e.clientY / window.innerHeight - 0.5;
-      if (orbRef.current) orbRef.current.style.transform = `translate3d(${px * 30}px, ${py * 30}px, 0)`;
-      if (raysRef.current) raysRef.current.style.transform = `rotate(${px * 6}deg)`;
-      if (deityRef.current)
-        deityRef.current.style.transform = `perspective(1000px) rotateY(${px * -12}deg) rotateX(${py * 8}deg) translateZ(20px)`;
-      if (plateRef.current)
-        plateRef.current.style.transform = `perspective(1200px) rotateX(${py * -4}deg) rotateY(${px * 4}deg)`;
-    };
-    window.addEventListener("mousemove", onMove);
-    return () => window.removeEventListener("mousemove", onMove);
-  }, []);
-
   return (
     <section className="hero" id="home">
-      <div className="orb" ref={orbRef} />
-      <div className="rays" ref={raysRef} />
-      <div className="hero-veil" />
-
-      <div className="deity" aria-hidden="true">
-        <div className="halo" />
-        <div ref={deityRef} style={{ transition: "transform .15s ease-out", willChange: "transform" }}>
-          <GaneshMark />
-        </div>
-      </div>
+      <div className="hero-bg" style={{ backgroundImage: "url('/Lord-Ganesh.webp')" }} aria-hidden="true" />
+      <div className="hero-overlay" aria-hidden="true" />
 
       <div className="hero-inner">
         <SiteLogo variant="hero" />
-        <p className="eyebrow">Mekanuru East Street</p>
-        <h1>
-          <em>Garudasena</em>
-        </h1>
+        <p className="hero-location">Mekanuru East Street</p>
+        <p className="eyebrow">Ganesh Chaturthi community celebration</p>
+        <h1>GARUDASENA</h1>
         <p className="hero-sub">Where heritage meets the energy of a new generation. A celebration made together, for everyone.</p>
 
-        <div className="countdown-plate" ref={plateRef}>
+        <div className="actions">
+          <a href="#contributions" className="btn btn-primary">
+            Join the celebration <span>→</span>
+          </a>
+          <a href="#about" className="btn btn-secondary">
+            Discover our story
+          </a>
+        </div>
+
+        <div className="countdown-plate">
           <span className="countdown-plate-label">Ganesh Chaturthi begins in</span>
           <Countdown />
         </div>
 
-        <div className="actions">
-          <a href="#contributions" className="button">
-            Join the celebration <span>→</span>
-          </a>
-          <a href="#about" className="link-underline">
-            Discover our story ↓
-          </a>
+        <div className="hero-tags">
+          <span className="pill">Ganesh Chaturthi 2026</span>
+          <span className="pill">Mekanuru youth group</span>
+          <span className="pill">Contributions via UPI</span>
         </div>
       </div>
-
-      <a className="scroll-cue" href="#about">
-        <span>Scroll to explore</span>
-        <i />
-      </a>
     </section>
   );
 }
 
-/* ---------------- Roster emblem (center anchor between the two groups) ---------------- */
-function RosterEmblem() {
+/* ---------------- Member card (photo, name, role) ----------------
+   Matches the reference site's team-grid pattern: circular photo on
+   top, name and role underneath. Falls back to initials if the image
+   is missing so the grid never shows a broken-image icon. */
+function MemberCard({ name, role, img, index }: { name: string; role: string; img: string; index: number }) {
+  const reveal = useReveal<HTMLDivElement>((index % 10) * 50);
   const [failed, setFailed] = useState(false);
   return (
-    <div className="roster-emblem">
-      <div className="roster-emblem-plate">
+    <div className="member-card" ref={reveal}>
+      <div className="member-photo">
         {!failed ? (
-          <img src="/Logo1.jpeg" alt="GARUDASENA emblem" onError={() => setFailed(true)} />
+          <img src={img} alt={name} onError={() => setFailed(true)} />
         ) : (
-          <span className="roster-emblem-fallback">✦</span>
+          <span className="member-photo-fallback">{getInitials(name)}</span>
         )}
       </div>
-      <div className="roster-emblem-label">
-        <span>Our Committee</span>
-        <strong>Garudasena · 2026</strong>
-      </div>
-    </div>
-  );
-}
-
-/* ---------------- Roster card (name + role, no photo) ---------------- */
-function RosterCard({ name, role, index, side }: { name: string; role: string; index: number; side: "left" | "right" }) {
-  const reveal = useRevealSide<HTMLDivElement>(side, index * 90);
-  return (
-    <div className="roster-card" ref={reveal}>
-      <span className="roster-avatar">{getInitials(name)}</span>
-      <div className="roster-info">
-        <h3>{name}</h3>
-        <p>{role}</p>
-      </div>
+      <h3>{name}</h3>
+      <p>{role}</p>
     </div>
   );
 }
@@ -390,7 +288,7 @@ function GalleryTile({ title, src, i, onOpen }: { title: string; src: string; i:
       onMouseLeave={tilt.onMouseLeave}
       onMouseEnter={tilt.onMouseEnter}
     >
-      <b>✦</b>
+     
       <img className="gallery-image" src={src} alt={title} />
       <span>{title}</span>
       <i>EXPLORE ↗</i>
@@ -443,7 +341,7 @@ export default function HomePage() {
             </a>
           ))}
         </nav>
-        <a className="nav-cta" href="#contributions">
+        <a className="btn btn-outline btn-sm nav-cta" href="#contributions">
           Contribute <span>↗</span>
         </a>
       </header>
@@ -489,21 +387,12 @@ export default function HomePage() {
           <br />
           many hands.
         </h2>
+        <p className="team-intro">The dedicated members who work together every year to make the Ganesh Chaturthi celebrations successful.</p>
 
-        <div className="roster">
-          <div className="roster-column roster-column--left">
-            {committeeLeft.map((m, i) => (
-              <RosterCard key={m.name} name={m.name} role={m.role} index={i} side="left" />
-            ))}
-          </div>
-
-          <RosterEmblem />
-
-          <div className="roster-column roster-column--right">
-            {committeeRight.map((m, i) => (
-              <RosterCard key={m.name} name={m.name} role={m.role} index={i} side="right" />
-            ))}
-          </div>
+        <div className="members-grid">
+          {committee.map((m, i) => (
+            <MemberCard key={m.name} name={m.name} role={m.role} img={m.img} index={i} />
+          ))}
         </div>
       </section>
 
@@ -518,7 +407,7 @@ export default function HomePage() {
             <em>support.</em>
           </h2>
           <p>Every contribution helps us create a meaningful, welcoming celebration for our entire community.</p>
-          <a href="#contact" className="button light">
+          <a href="#contact" className="btn btn-light">
             Contribute now <span>→</span>
           </a>
         </div>
@@ -538,7 +427,7 @@ export default function HomePage() {
 
               <div className="upi-row">
                 <strong>7989141890@ybl</strong>
-                <button type="button" onClick={() => navigator.clipboard.writeText("7989141890@ybl")}>
+                <button type="button" className="btn btn-copy" onClick={() => navigator.clipboard.writeText("7989141890@ybl")}>
                   Copy
                 </button>
               </div>
@@ -640,7 +529,7 @@ export default function HomePage() {
         <div className="modal" onClick={() => setPicked(null)}>
           <div onClick={(e) => e.stopPropagation()}>
             <button onClick={() => setPicked(null)}>×</button>
-            <span>✦</span>
+            
             <h3>{picked}</h3>
             <p>GARUDASENA · 2026</p>
           </div>
