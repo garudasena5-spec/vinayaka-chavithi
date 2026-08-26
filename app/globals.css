@@ -96,11 +96,104 @@ h1 em,h2 em{font-style:italic;font-weight:500;color:var(--marigold)}
 .section h2{font-size:clamp(40px,4.6vw,66px);line-height:1.04;color:var(--ink)}
 .link-underline{display:inline-block;font:700 11px/1 Manrope;letter-spacing:.06em;color:var(--maroon);border-bottom:1px solid currentColor;padding-bottom:3px}
 
+/* ============ LOADING SCREEN ============
+   Full-screen intro shown for ~5.5-6s on every load/reload: three
+   pulsing "aarti" rings, a stylised Ganesha mark (glowing, trunk
+   swaying, ears flapping), the group name revealed letter by letter,
+   and a thin progress hairline that fills across the full duration.
+   Fades out (not unmounts abruptly) into the page underneath. */
+.loader{
+  position:fixed;inset:0;z-index:200;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 38%,var(--night-2),var(--night) 72%);
+  overflow:hidden;
+  transition:opacity .7s ease,visibility .7s ease;
+}
+.loader.hide{opacity:0;visibility:hidden;pointer-events:none}
+
+.loader-rings{position:relative;width:180px;height:180px;display:grid;place-items:center;margin-bottom:6px}
+.loader-ring{
+  position:absolute;top:50%;left:50%;width:100%;height:100%;border-radius:50%;
+  border:1px solid #f1bd7845;
+  transform:translate(-50%,-50%) scale(.5);
+  animation:ringPulse 2.6s ease-out infinite;
+}
+.loader-ring:nth-child(2){animation-delay:.85s}
+.loader-ring:nth-child(3){animation-delay:1.7s}
+@keyframes ringPulse{
+  0%{transform:translate(-50%,-50%) scale(.5);opacity:.85}
+  100%{transform:translate(-50%,-50%) scale(1.35);opacity:0}
+}
+
+.loader-glow{
+  position:absolute;inset:-32%;z-index:1;border-radius:50%;
+  background:radial-gradient(circle,#e6a13a55,transparent 65%);
+  animation:glowPulse 2.3s ease-in-out infinite;
+}
+@keyframes glowPulse{0%,100%{opacity:.5;transform:scale(.9)}50%{opacity:1;transform:scale(1.08)}}
+
+.loader-mark{position:relative;z-index:2;width:108px;height:108px;filter:drop-shadow(0 10px 24px #00000080)}
+.loader-trunk{transform-origin:52px 58px;animation:trunkSway 2.6s ease-in-out infinite}
+@keyframes trunkSway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(7deg)}}
+.loader-ear{animation:earFlap 3.4s ease-in-out infinite}
+.loader-ear.left{transform-origin:28px 42px;animation-delay:.15s}
+.loader-ear.right{transform-origin:76px 42px}
+@keyframes earFlap{0%,100%{transform:rotate(0deg) scale(1)}50%{transform:rotate(3deg) scale(1.015)}}
+
+.loader-eyebrow{
+  margin:24px 0 4px;font:700 10px/1 "Space Mono",monospace;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--marigold);opacity:0;
+  animation:fadeUp .6s ease .35s forwards;
+}
+
+.loader-text{display:flex;overflow:hidden;padding:2px 0}
+.loader-text span{
+  display:inline-block;font:600 clamp(19px,4vw,30px) Fraunces;letter-spacing:.02em;
+  color:#f8ece0;opacity:0;transform:translateY(110%);
+  animation:letterUp .7s cubic-bezier(.2,.8,.2,1) forwards;
+}
+@keyframes letterUp{to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{to{opacity:1}}
+
+.loader-sub{
+  margin-top:10px;font:700 9px/1 "Space Mono",monospace;letter-spacing:.16em;
+  text-transform:uppercase;color:#c9b493;opacity:0;
+  animation:fadeUp .6s ease 1.5s forwards;
+}
+
+.loader-bar{margin-top:36px;width:180px;height:2px;border-radius:2px;background:#ffffff1a;overflow:hidden}
+.loader-bar i{display:block;height:100%;width:0%;border-radius:2px;font-style:normal;
+  background:linear-gradient(90deg,var(--maroon),var(--marigold));
+  animation:loadFill 5.6s linear forwards;
+}
+@keyframes loadFill{to{width:100%}}
+
+.loader-flowers{position:absolute;inset:0;pointer-events:none;z-index:0}
+.loader-flowers span{
+  position:absolute;color:var(--marigold);opacity:.35;font-size:16px;
+  animation:driftFloat 6s ease-in-out infinite;
+}
+@keyframes driftFloat{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-16px) rotate(8deg)}}
+
+@media(prefers-reduced-motion:reduce){
+  .loader-ring,.loader-glow,.loader-trunk,.loader-ear,.loader-bar i,.loader-flowers span{animation:none!important}
+  .loader-text span{animation:fadeUp .6s ease forwards!important;transform:none!important}
+}
+
+@media(max-width:480px){
+  .loader-rings{width:140px;height:140px}
+  .loader-mark{width:86px;height:86px}
+  .loader-bar{width:150px}
+}
+
 /* ============ HERO ============
-   Static full-bleed photo hero (matches the reference site): a
-   background image + dark legibility overlay, emblem, small location
-   tag, eyebrow, big headline, subtitle, two CTA buttons side by side,
-   a boxed countdown, and a row of small pill tags underneath. */
+   Static full-bleed hero (matches the reference site): a background
+   media layer (image OR animated gif — same .hero-bg element, the
+   browser animates a GIF background-image natively) + a dark
+   legibility overlay so headline/CTAs/countdown stay readable over
+   motion, emblem, small location tag, eyebrow, big headline,
+   subtitle, two CTA buttons side by side, a boxed countdown, and a
+   row of small pill tags underneath. */
 .hero{position:relative;min-height:100svh;overflow:hidden;color:#fdf5e8;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:150px 6% 90px;text-align:center}
 .hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-color:var(--night);transform:scale(1.02)}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,#160f0acc 0%,#160f0af0 55%,#100a06 100%)}

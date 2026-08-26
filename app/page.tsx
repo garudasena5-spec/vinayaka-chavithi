@@ -59,6 +59,16 @@ const gallery = [
   { title: "The Process", src: "./ganesh3.jpg" },
 ];
 const GOOGLE_DRIVE_MEMORIES_URL = "https://photos.app.goo.gl/a4Uqh3aS8WCVZYVx9";
+
+/* ------------------------------------------------------------------
+   Hero background media. Drop your animated file at this exact path
+   inside /public (e.g. public/hero-bg.gif) — a GIF works as a plain
+   CSS background-image and will animate on its own, no video tag or
+   extra JS required. If you'd rather keep a different filename, just
+   edit the string below to match it.
+------------------------------------------------------------------- */
+const HERO_BG_SRC = "/hero-bg1.gif";
+
 type FinancialSummary = {
   totalReceived: number;
   totalSpent: number;
@@ -210,14 +220,17 @@ function Countdown() {
 }
 
 /* ---------------- Hero ----------------
-   Static full-bleed photo hero (matches the reference site): a
-   background image, a legibility overlay, emblem + eyebrow + headline,
-   two side-by-side CTA buttons, and the countdown plate underneath.
-   Drop your own photo at /public/hero-ganesh.jpg. */
+   Static full-bleed photo/gif hero (matches the reference site): a
+   background media layer, a legibility overlay, emblem + eyebrow +
+   headline, two side-by-side CTA buttons, and the countdown plate
+   underneath. The background element itself doesn't care whether the
+   file is a static image or an animated GIF — set HERO_BG_SRC above
+   to your file's path and it renders (and animates, if it's a GIF)
+   automatically. */
 function Hero() {
   return (
     <section className="hero" id="home">
-      <div className="hero-bg" style={{ backgroundImage: "url('/Lord-Ganesh.webp')" }} aria-hidden="true" />
+      <div className="hero-bg" style={{ backgroundImage: `url('${HERO_BG_SRC}')` }} aria-hidden="true" />
       <div className="hero-overlay" aria-hidden="true" />
 
       <div className="hero-inner">
@@ -248,6 +261,112 @@ function Hero() {
         </div>
       </div>
     </section>
+  );
+}
+
+/* ---------------- Ganesha mark (inline SVG used by the loader) ----------------
+   A minimal, stylised elephant-head glyph — ears, crown dot, eyes and
+   a curved trunk — built from plain shapes so it stays crisp at any
+   size and can be animated purely with CSS (trunk sway + ear flap). */
+function GaneshaMark() {
+  return (
+    <svg className="loader-mark" viewBox="0 0 104 104" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="ganeshGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#f0b661" />
+          <stop offset="100%" stopColor="#7a2230" />
+        </linearGradient>
+      </defs>
+      <ellipse className="loader-ear left" cx="26" cy="44" rx="19" ry="23" fill="url(#ganeshGrad)" opacity="0.94" />
+      <ellipse className="loader-ear right" cx="78" cy="44" rx="19" ry="23" fill="url(#ganeshGrad)" opacity="0.94" />
+      <circle cx="52" cy="46" r="26" fill="url(#ganeshGrad)" />
+      <circle cx="52" cy="21" r="3.4" fill="#fff3de" />
+      <path d="M46 16 L52 10 L58 16" stroke="#fff3de" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="43" cy="42" r="2.6" fill="#1a1006" />
+      <circle cx="61" cy="42" r="2.6" fill="#1a1006" />
+      <path d="M56 58 L 62 64" stroke="#fff3de" strokeWidth="3" strokeLinecap="round" />
+      <path
+        className="loader-trunk"
+        d="M50 58 C 48 68, 61 69, 59 79 C 58 85, 49 87, 44 83"
+        stroke="#fff3de"
+        strokeWidth="6.5"
+        fill="none"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+/* ---------------- Loading screen ----------------
+   Full-screen intro shown for ~5.5-6s on every load and every reload
+   (it's tied to component mount, not to any stored "seen before"
+   flag, so it plays every single time the page opens). Three pulsing
+   rings breathe behind a glowing, gently-animated Ganesha mark; the
+   group name reveals letter by letter underneath; a thin progress
+   hairline fills across the same duration; then the whole thing
+   fades into the page. Scrolling is locked while it's up so nothing
+   jumps once it clears. */
+const LOADER_DURATION_MS = 5800;
+const LOADER_FADE_MS = 650;
+const LOADER_REDUCED_MS = 2200;
+const LOADER_WORD = "MEKANURU YOUTH";
+
+function LoadingScreen({ onDone }: { onDone: () => void }) {
+  const [hide, setHide] = useState(false);
+
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const duration = reduce ? LOADER_REDUCED_MS : LOADER_DURATION_MS;
+
+    const hideTimer = setTimeout(() => setHide(true), duration);
+    const doneTimer = setTimeout(() => {
+      document.body.style.overflow = prevOverflow;
+      onDone();
+    }, duration + LOADER_FADE_MS);
+
+    return () => {
+      clearTimeout(hideTimer);
+      clearTimeout(doneTimer);
+      document.body.style.overflow = prevOverflow;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div className={`loader ${hide ? "hide" : ""}`} role="status" aria-live="polite" aria-label="Loading GARUDASENA">
+      <div className="loader-flowers" aria-hidden="true">
+        <span style={{ left: "12%", top: "18%" }}>✿</span>
+        <span style={{ right: "14%", top: "24%", animationDelay: "1.4s" }}>✿</span>
+        <span style={{ left: "18%", bottom: "20%", animationDelay: "2.6s" }}>✿</span>
+        <span style={{ right: "10%", bottom: "16%", animationDelay: "3.4s" }}>✿</span>
+      </div>
+
+      <div className="loader-rings" aria-hidden="true">
+        <span className="loader-ring" />
+        <span className="loader-ring" />
+        <span className="loader-ring" />
+        <div className="loader-glow" />
+        <GaneshaMark />
+      </div>
+
+      <p className="loader-eyebrow">Ganpati Bappa Morya</p>
+
+      <div className="loader-text">
+        {LOADER_WORD.split("").map((ch, i) => (
+          <span key={i} style={{ animationDelay: `${0.55 + i * 0.045}s` }}>
+            {ch === " " ? "\u00A0" : ch}
+          </span>
+        ))}
+      </div>
+
+      <p className="loader-sub">Ganesh Chaturthi · 2026</p>
+
+      <div className="loader-bar" aria-hidden="true">
+        <i />
+      </div>
+    </div>
   );
 }
 
@@ -311,6 +430,7 @@ export default function HomePage() {
   const [menu, setMenu] = useState(false);
   const [picked, setPicked] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [financialSummary, setFinancialSummary] = useState<FinancialSummary | null>(null);
   const qrTilt = useTilt<HTMLDivElement>(6);
 
@@ -326,6 +446,7 @@ export default function HomePage() {
 
   return (
     <main>
+      {loading && <LoadingScreen onDone={() => setLoading(false)} />}
       <div className="grain" />
       <header className={`nav ${scrolled ? "scrolled" : ""}`}>
         <a className="brand" href="#home">
