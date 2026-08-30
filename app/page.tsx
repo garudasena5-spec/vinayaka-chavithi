@@ -61,13 +61,16 @@ const gallery = [
 const GOOGLE_DRIVE_MEMORIES_URL = "https://photos.app.goo.gl/a4Uqh3aS8WCVZYVx9";
 
 /* ------------------------------------------------------------------
-   Hero background media. Drop your animated file at this exact path
-   inside /public (e.g. public/hero-bg.gif) — a GIF works as a plain
-   CSS background-image and will animate on its own, no video tag or
-   extra JS required. If you'd rather keep a different filename, just
-   edit the string below to match it.
+   Hero background media. Drop your video file at this exact path
+   inside /public (e.g. public/hero-bg1.mp4). It renders through a
+   real <video> element below — autoplay, muted, loop, playsInline —
+   so it behaves like a silent looping background on both desktop and
+   mobile. An optional poster frame shows instantly while the video
+   buffers, so there's never a flash of black. Change either path to
+   match your actual file names.
 ------------------------------------------------------------------- */
-const HERO_BG_SRC = "/hero-bg1.gif";
+const HERO_BG_SRC = "/hero-bg1.mp4";
+const HERO_BG_POSTER = "/hero-bg1-poster.jpg"; // optional — first-frame fallback image; remove the poster prop below if you don't have one
 
 type FinancialSummary = {
   totalReceived: number;
@@ -220,17 +223,28 @@ function Countdown() {
 }
 
 /* ---------------- Hero ----------------
-   Static full-bleed photo/gif hero (matches the reference site): a
-   background media layer, a legibility overlay, emblem + eyebrow +
-   headline, two side-by-side CTA buttons, and the countdown plate
-   underneath. The background element itself doesn't care whether the
-   file is a static image or an animated GIF — set HERO_BG_SRC above
-   to your file's path and it renders (and animates, if it's a GIF)
-   automatically. */
+   Static full-bleed video hero (matches the reference site): a
+   background <video> layer (autoplay, muted, loop, playsInline — the
+   combination required for browsers, especially iOS Safari, to allow
+   autoplay without a user tap), a legibility overlay, emblem +
+   eyebrow + headline, two side-by-side CTA buttons, and the
+   countdown plate underneath. Set HERO_BG_SRC above to your actual
+   video file path — it will loop silently in the background on both
+   desktop and mobile. */
 function Hero() {
   return (
     <section className="hero" id="home">
-      <div className="hero-bg" style={{ backgroundImage: `url('${HERO_BG_SRC}')` }} aria-hidden="true" />
+      <video
+        className="hero-bg"
+        src={HERO_BG_SRC}
+        poster={HERO_BG_POSTER}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+      />
       <div className="hero-overlay" aria-hidden="true" />
 
       <div className="hero-inner">
