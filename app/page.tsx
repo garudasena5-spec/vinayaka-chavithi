@@ -25,7 +25,6 @@ const committee = [
   { name: "B.Teja", role: "Media Organizer", img: "Teja.jpeg" },
   { name: "P.Dinesh", role: "Logistics Head", img: "Dinesh.png" },
   { name: "P.Charan", role: "Art Manager", img: "P.Charan.jpeg" },
-  { name: "U.Adi", role: "Support Lead", img: "/members/adi.jpg" },
   { name: "M.Srinu", role: "Support Coordinator", img: "Srinu .png" },
   { name: "M.Sai Teja", role: "Pooja Coordinator", img: "/members/saiteja.jpg" },
   { name: "M.Sai", role: "Vice President", img: "Sai.jpeg" },
