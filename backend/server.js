@@ -10,7 +10,7 @@ const seedAdmin = require("./seed");
 
 const app = express();
 const port = process.env.PORT || 5000;
-const origins = ["http://localhost:3000", "https://vinayaka-chavithi-five.vercel.app",process.env.FRONTEND_URL].filter(Boolean);
+const origins = ["http://localhost:3000", "https://vinayaka-chavithi-five.vercel.app","https://garudasena.in",process.env.FRONTEND_URL].filter(Boolean);
 
 app.use(helmet());
 app.use(cors({ origin: (origin, callback) => !origin || origins.includes(origin) ? callback(null, true) : callback(new Error("CORS origin denied")), credentials: true }));
