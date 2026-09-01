@@ -15,7 +15,7 @@ const committee = [
   { name: "M.Sudheer", role: "Organizer & Sponsorship Lead", img: "/members/sudheer.jpg" },
   { name: "P.Srikanth Reddy", role: "Event Coordinator", img: "/members/srikanth.jpg" },
   { name: "K.Pavan", role: "President", img: "/members/pavan.jpg" },
-  { name: "K.Vinay", role: "Event Organizer", img: "/members/vinay-k.jpg" },
+  { name: "K.Vinay", role: "Event Organizer", img: "vinay.jpeg" },
   { name: "K.Vamsi", role: "Treasurer", img: "/members/vamsi.jpg" },
   { name: "Venky Parvatala", role: "Creative Director & Website Administrator", img: "teammem6.jpeg" },
   { name: "K.Sudhakar", role: "Utsav Head", img: "/members/sudhakar.jpg" },
