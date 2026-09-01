@@ -12,8 +12,8 @@ const nav = ["Home", "About", "Team", "Contributions", "Gallery", "Contact"];
    falls back to initials if an image 404s.
 ------------------------------------------------------------------- */
 const committee = [
-  { name: "M.Sudheer", role: "Organizer & Sponsorship Lead", img: "/members/sudheer.jpg" },
-  { name: "P.Srikanth Reddy", role: "Event Coordinator", img: "/members/srikanth.jpg" },
+  { name: "M.Sudheer", role: "Organizer & Sponsorship Lead", img: "SS.jpeg" },
+  { name: "P.Srikanth Reddy", role: "Event Coordinator", img: "PS.jpeg" },
   { name: "K.Pavan", role: "President", img: "K.Pavan.jpeg" },
   { name: "K.Vinay", role: "Event Organizer", img: "vinay.jpeg" },
   { name: "K.Vamsi", role: "Treasurer", img: "/members/vamsi.jpg" },
@@ -22,12 +22,12 @@ const committee = [
   { name: "K.Rahul", role: "Volunteer Captain", img: "Rahul.jpeg" },
   { name: "K.Praveen", role: "Visarjan Head", img: "Praveen.jpeg" },
   { name: "K.Satheesh", role: "Art President", img: "K.Sateesh.jpeg" },
+  { name: "M.Sai", role: "Vice President", img: "MS.jpeg" },
   { name: "B.Teja", role: "Media Organizer", img: "Teja.jpeg" },
   { name: "P.Dinesh", role: "Logistics Head", img: "Dinesh.png" },
   { name: "P.Charan", role: "Art Manager", img: "P.Charan.jpeg" },
   { name: "M.Srinu", role: "Support Coordinator", img: "Srinu .png" },
   { name: "M.Sai Teja", role: "Pooja Coordinator", img: "/members/saiteja.jpg" },
-  { name: "M.Sai", role: "Vice President", img: "Sai.jpeg" },
   { name: "M.Hemanth", role: "Fund Rising Manager", img: "Hemanth.jpeg" },
   { name: "A.Naveen", role: "Community Head", img: "A.Naveen.jpeg" },
   { name: "P.Yaswanth", role: "Art Member", img: "/members/yaswanth.jpg" },
