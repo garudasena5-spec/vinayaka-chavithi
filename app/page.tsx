@@ -15,8 +15,8 @@ const committee = [
   { name: "M.Sudheer", role: "Organizer & Sponsorship Lead", img: "SS.jpeg" },
   { name: "P.Srikanth Reddy", role: "Event Coordinator", img: "PS.jpeg" },
   { name: "K.Pavan", role: "President", img: "K.Pavan.jpeg" },
-  { name: "K.Vinay", role: "Event Organizer", img: "vinay2.jpeg" },
-  { name: "K.Vamsi", role: "Treasurer", img: "Vamsi.jpg" },
+  { name: "K.Vinay", role: "Event Organizer", img: "Vinay2.jpeg" },
+  { name: "K.Vamsi", role: "Treasurer", img: "Vamsi.jpeg" },
   { name: "Venky Parvatala", role: "Creative Director & Website Administrator", img: "teammem6.jpeg" },
   { name: "K.Sudhakar", role: "Utsav Head", img: "Sudha.png" },
   { name: "K.Rahul", role: "Volunteer Captain", img: "Rahul.jpeg" },
@@ -38,6 +38,7 @@ const committee = [
   { name: "A.Hariprasad", role: "Art Member", img: "Hari.jpeg" },
   { name: "K.Prasanth", role: "Support Member", img: "UP.jpeg" },
   { name: "P.Vinay", role: "Support Member", img: "PV.jpeg" },
+  { name: "U.Adi", role: "Support Member", img: "UP.jpeg" },
 ];
 
 function getInitials(name: string): string {
