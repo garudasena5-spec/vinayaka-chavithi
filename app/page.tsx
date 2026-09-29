@@ -60,7 +60,7 @@ const gallery = [
   { title: "The Process", src: "./ganesh3.jpg" },
 ];
 const fundMoments = [
-  { title: "P.SWATHI GARU", description: "IDOL DONOR - With sincere thanks for your generous contribution. 🙏", src: "Ganesh1.jpeg" },
+  { title: "P.SWATHI GARU", description: "IDOL DONOR - With sincere thanks for your generous contribution. 🙏", src: "Ganesh2.jpeg" },
   { title: "M.VISHNU VARDHAN REDDY GARU", description: "ANNADHANAM SPONSOR - Grateful for your kind contribution and support. 🌸", src: "Annadhanam.jpeg" },
   { title: "P.SRIKANTH REDDY GARU", description: "GAJAMALA SPONSOR - Your thoughtful contribution is deeply appreciated. 🌺", src: "Gajamala.jpeg" },
   { title: "K.VENU GARU", description: "LIGHTING CONTRIBUTOR - Honoured to have your generous support in our celebration. ✨", src: "Lights.jpg" },
