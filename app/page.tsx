@@ -59,6 +59,13 @@ const gallery = [
   { title: "Devotion", src: "./ganesh4.png" },
   { title: "The Process", src: "./ganesh3.jpg" },
 ];
+const fundMoments = [
+  { title: "P.SWATHI GARU", description: "IDOL DONOR - With sincere thanks for your generous contribution. 🙏", src: "Ganesh1.jpeg" },
+  { title: "M.VISHNU VARDHAN REDDY GARU", description: "ANNADHANAM SPONSOR - Grateful for your kind contribution and support. 🌸", src: "Annadhanam.jpeg" },
+  { title: "P.SRIKANTH REDDY GARU", description: "GAJAMALA SPONSOR - Your thoughtful contribution is deeply appreciated. 🌺", src: "Gajamala.jpeg" },
+  { title: "K.VENU GARU", description: "LIGHTING CONTRIBUTOR - Honoured to have your generous support in our celebration. ✨", src: "Lights.jpg" },
+  { title: "K.SRINIVASULU GARU", description: "LADDU CONTRIBUTOR - Thank you for making the celebration sweeter with your kind support. 🍥", src: "Laddu.jpeg" },
+];
 const GOOGLE_DRIVE_MEMORIES_URL = "https://photos.app.goo.gl/a4Uqh3aS8WCVZYVx9";
 
 /* ------------------------------------------------------------------
@@ -430,6 +437,21 @@ function GalleryTile({ title, src, i, onOpen }: { title: string; src: string; i:
   );
 }
 
+function FundMomentCard({ title, description, src, index }: { title: string; description: string; src: string; index: number }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <article className="fund-moment-card">
+      <div className={`fund-moment-image fund-moment-image--${index}`}>
+        {!failed ? <img src={src} alt={title} onError={() => setFailed(true)} /> : <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>}
+      </div>
+      <div className="fund-moment-copy">
+        <h3>{title}</h3>
+        <p>{description}</p>
+      </div>
+    </article>
+  );
+}
+
 /** Generic scroll-reveal wrapper for whole sections (div, not <section>,
     so it can wrap any element type without prop-type friction). */
 function Reveal({ children, delay = 0, ...rest }: { children: React.ReactNode; delay?: number; className?: string; id?: string }) {
@@ -615,6 +637,16 @@ export default function HomePage() {
           </div>
         </div>
       </Reveal>
+
+      <section className="fund-moments section" aria-label="How the celebration comes together">
+        <div className="fund-moments-heading">
+          <p className="eyebrow">YOUR SUPPORT IN ACTION</p>
+          <h2>Made possible <em>together.</em></h2>
+        </div>
+        <div className="fund-moments-list">
+          {fundMoments.map((moment, index) => <FundMomentCard key={moment.src} {...moment} index={index} />)}
+        </div>
+      </section>
 
       <section className="gallery section" id="gallery">
         <div className="gallery-head">

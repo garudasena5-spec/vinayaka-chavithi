@@ -344,6 +344,7 @@ h1 em,h2 em{font-style:italic;font-weight:500;color:var(--marigold)}
 .fund-cards .balance{background:var(--maroon);border-color:var(--maroon)}
 .fund-cards .balance span{color:#f1cf94}.fund-cards .balance strong{color:#fff5e5}
 .expense-breakdown{padding-top:20px}
+.fund-moments{display:none}
 .expense-heading{display:flex;align-items:end;justify-content:space-between;gap:18px;padding-bottom:20px;border-bottom:1px solid var(--paper-line)}
 .expense-heading .eyebrow{margin-bottom:10px}.expense-heading h3{margin:0;font:600 clamp(28px,3.5vw,42px)/1.05 Fraunces;color:var(--ink)}
 .expense-heading h3 em{font-weight:500;color:var(--maroon)}
@@ -482,6 +483,24 @@ footer h2{font-size:clamp(48px,6vw,80px);color:#221407}
   .fund-cards>div{min-height:78px;flex-direction:row;align-items:center;gap:12px}
   .expense-breakdown{padding-top:0}
   .expense-heading{align-items:flex-start;flex-direction:column;gap:10px}
+
+  .fund-moments{display:block;padding-top:0}
+  .fund-moments-heading{margin-bottom:28px}
+  .fund-moments-heading h2{margin:0;font-size:clamp(32px,9vw,44px);color:var(--ink)}
+  .fund-moments-heading h2 em{color:var(--maroon)}
+  .fund-moments-list{display:grid;gap:18px}
+  .fund-moment-card{overflow:hidden;border:1px solid var(--paper-line);border-radius:8px;background:#fffaf0}
+  .fund-moment-image{position:relative;display:grid;place-items:center;aspect-ratio:1.48;background:linear-gradient(145deg,#6b251b,#d9923d)}
+  .fund-moment-image:after{position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,#1d100a42);content:"";pointer-events:none}
+  .fund-moment-image img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .fund-moment-image span{font:600 48px Fraunces;color:#fff2d8a8}
+  .fund-moment-image--1{background:linear-gradient(145deg,#7f3024,#e4aa4c)}
+  .fund-moment-image--2{background:linear-gradient(145deg,#614126,#c47b36)}
+  .fund-moment-image--3{background:linear-gradient(145deg,#344c42,#bc7935)}
+  .fund-moment-image--4{background:linear-gradient(145deg,#6c291e,#d2a14d)}
+  .fund-moment-copy{padding:15px 16px 17px}
+  .fund-moment-copy h3{margin:0;font:600 19px/1.2 Fraunces;color:var(--maroon)}
+  .fund-moment-copy p{margin:7px 0 0;color:#59503f;font-size:12px;line-height:1.7}
 
   .gallery-grid{grid-template-columns:1fr;grid-template-rows:none;gap:12px}
   .gallery-head{display:block}
